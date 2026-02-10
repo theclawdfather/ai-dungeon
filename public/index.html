@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐉 AI Dungeon Master</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Landing Screen -->
+        <div id="landingScreen" class="screen">
+            <div class="container">
+                <h1>🐉 AI Dungeon Master</h1>
+                <p class="tagline">An AI-powered D&D adventure awaits</p>
+                
+                <div class="actions">
+                    <button id="newCampaignBtn" class="btn-primary">🎭 New Adventure</button>
+                    <button id="loadCampaignBtn" class="btn-secondary">📜 Load Campaign</button>
+                </div>
+                
+                <div id="campaignList" class="campaign-list hidden">
+                    <h3>Your Campaigns</h3>
+                    <div id="campaignsContainer"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Character Creation -->
+        <div id="characterScreen" class="screen hidden">
+            <div class="container">
+                <h2>Create Your Character</h2>
+                
+                <form id="characterForm">
+                    <div class="form-group">
+                        <label>Character Name</label>
+                        <input type="text" id="charName" required placeholder="Thorin Oakenshield">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Race</label>
+                            <select id="charRace" required>
+                                <option value="">Select Race...</option>
+                                <option value="Human">Human</option>
+                                <option value="Elf">Elf</option>
+                                <option value="Dwarf">Dwarf</option>
+                                <option value="Halfling">Halfling</option>
+                                <option value="Dragonborn">Dragonborn</option>
+                                <option value="Tiefling">Tiefling</option>
+                                <option value="Half-Orc">Half-Orc</option>
+                                <option value="Gnome">Gnome</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="charClass" required>
+                                <option value="">Select Class...</option>
+                                <option value="Fighter">Fighter</option>
+                                <option value="Wizard">Wizard</option>
+                                <option value="Rogue">Rogue</option>
+                                <option value="Cleric">Cleric</option>
+                                <option value="Ranger">Ranger</option>
+                                <option value="Paladin">Paladin</option>
+                                <option value="Barbarian">Barbarian</option>
+                                <option value="Bard">Bard</option>
+                                <option value="Monk">Monk</option>
+                                <option value="Warlock">Warlock</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Backstory (Optional)</label>
+                        <textarea id="charBackstory" rows="3" placeholder="A mysterious past, a quest for revenge, or simply seeking fortune..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="showLanding()">← Back</button>
+                        <button type="submit" class="btn-primary">Begin Adventure →</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen hidden">
+            <div class="game-container">
+                <!-- Header -->
+                <header class="game-header">
+                    <button id="backToMenu" class="btn-icon">←</button>
+                    <div class="character-info">
+                        <span id="charInfo"></span>
+                    </div>
+                    <button id="rollDiceBtn" class="btn-secondary">🎲 Roll d20</button>
+                </header>
+                
+                <!-- Story Log -->
+                <div id="storyLog" class="story-log"></div>
+                
+                <!-- Input Area -->
+                <div class="input-area"
+                    <div id="diceResult" class="dice-result hidden"></div>
+                    <div class="action-input">
+                        <input type="text" id="actionInput" placeholder="What do you do?" maxlength="500">
+                        <button id="sendAction" class="btn-primary">Send</button>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-btn" data-action="Look around">👁️ Look</button>
+                        <button class="quick-btn" data-action="Talk to the nearest person">💬 Talk</button>
+                        <button class="quick-btn" data-action="Check my inventory">🎒 Inventory</button>
+                        <button class="quick-btn" data-action="Rest and recover">😴 Rest</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>The DM is thinking...</p>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
