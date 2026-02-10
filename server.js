@@ -79,6 +79,8 @@ app.post('/api/campaigns', async (req, res) => {
     // Generate opening scene
     const context = `New campaign starting. Character: ${character.name}, a level 1 ${character.race} ${character.class}. Backstory: ${character.backstory || 'Mysterious wanderer seeking adventure.'}`;
     
+    console.log('Generating opening scene for:', character.name);
+    
     const openingScene = await generateDMResponse(
       [{ role: 'user', content: 'Begin the adventure. Introduce the starting scenario.' }],
       context
@@ -95,8 +97,9 @@ app.post('/api/campaigns', async (req, res) => {
     
     res.json({ campaignId, openingScene });
   } catch (err) {
-    console.error('Error creating campaign:', err);
-    res.status(500).json({ error: 'Failed to create campaign' });
+    console.error('Error creating campaign:', err.message);
+    console.error(err.stack);
+    res.status(500).json({ error: 'Failed to create campaign', details: err.message });
   }
 });
 
