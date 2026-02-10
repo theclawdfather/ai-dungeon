@@ -304,11 +304,6 @@ What do you do?`
   return genericResponses[playerMessages.length % genericResponses.length];
 }
 
-Around you, the adventure continues to unfold. Every choice shapes your destiny.
-
-What do you do?`;
-}
-
 // Create new campaign
 app.post('/api/campaigns', async (req, res) => {
   try {
