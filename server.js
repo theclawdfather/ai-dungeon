@@ -1,5 +1,4 @@
 const express = require('express');
-const OpenAI = require('openai');
 const path = require('path');
 const { Low } = require('lowdb');
 const { JSONFile } = require('lowdb/node');
@@ -9,10 +8,20 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// OpenAI setup
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+// AI Provider setup
+const AI_PROVIDER = process.env.AI_PROVIDER || 'mock'; // 'openai', 'groq', or 'mock'
+
+let openai = null;
+if (AI_PROVIDER === 'openai' && process.env.OPENAI_API_KEY) {
+  const OpenAI = require('openai');
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+} else if (AI_PROVIDER === 'groq' && process.env.GROQ_API_KEY) {
+  const OpenAI = require('openai');
+  openai = new OpenAI({ 
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: 'https://api.groq.com/openai/v1'
+  });
+}
 
 // LowDB setup
 const adapter = new JSONFile('campaigns.json');
@@ -29,7 +38,7 @@ async function initDb() {
   await db.write();
 }
 
-// Generate AI response
+// Generate AI response (or mock response)
 async function generateDMResponse(messages, campaignContext) {
   const systemPrompt = `You are an expert Dungeon Master running a D&D 5e campaign. 
 
@@ -48,8 +57,16 @@ RULES:
 
 Keep responses engaging and move the story forward.`;
 
+  // Mock mode - no API needed
+  if (AI_PROVIDER === 'mock' || !openai) {
+    return generateMockResponse(messages, campaignContext);
+  }
+
+  // Groq uses different model names
+  const model = AI_PROVIDER === 'groq' ? 'llama3-8b-8192' : 'gpt-4o-mini';
+
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: model,
     messages: [
       { role: 'system', content: systemPrompt },
       ...messages
@@ -59,6 +76,87 @@ Keep responses engaging and move the story forward.`;
   });
 
   return response.choices[0].message.content;
+}
+
+// Mock responses for demo mode (no API needed)
+function generateMockResponse(messages, context) {
+  const playerMessages = messages.filter(m => m.role === 'user');
+  const lastMessage = playerMessages[playerMessages.length - 1]?.content.toLowerCase() || '';
+  
+  // Extract character info from context
+  const charMatch = context.match(/Character: (.+?), a level 1 (.+?) (.+?)\./);
+  const charName = charMatch ? charMatch[1] : 'Adventurer';
+  const charRace = charMatch ? charMatch[2] : 'Human';
+  const charClass = charMatch ? charMatch[3] : 'Fighter';
+  
+  // Opening scene
+  if (lastMessage.includes('begin') || playerMessages.length === 1) {
+    return `The tavern door creaks as ${charName} steps inside, the warmth of the hearth washing over you. The Rusty Tankard is alive with evening activity—merchants argue over prices in the corner, a bard strums a melancholy tune, and the smell of roasting meat fills the air.
+
+A burly bartender with a scarred eye spots you and nods. "Fresh blood, eh? We don't get many ${charRace} ${charClass}s in these parts." He slides a mug across the counter. "Word is there's trouble down at the old well. Something's been taking the villagers at night. The mayor's offering 50 gold to anyone brave enough to investigate."
+
+In the shadows near the door, a hooded figure watches you intently, their face hidden beneath a dark cloak.
+
+What do you do?`;
+  }
+  
+  // Generic responses based on keywords
+  if (lastMessage.includes('tavern') || lastMessage.includes('bar')) {
+    return `The tavern buzzes with low conversation. You approach the bar and catch snippets of gossip—something about missing livestock, strange lights in the forest, and a merchant offering suspiciously good prices for "rare antiquities."
+
+The bartender leans in close. "You look like you can handle yourself. If you're looking for work, old Thomas hasn't returned from the mill since yesterday. His daughter's offering her grandmother's ring as reward."
+
+A scuffle breaks out near the dice table as someone accuses another of cheating.
+
+What do you do?`;
+  }
+  
+  if (lastMessage.includes('talk') || lastMessage.includes('speak')) {
+    return `You approach the figure. They startle briefly, then relax when they see you mean no harm. Pushing back their hood reveals an elven woman with haunted eyes.
+
+"You're the adventurer everyone's talking about," she whispers urgently. "Listen carefully—I don't have much time. The cult of the Dark Star meets tonight at the abandoned chapel on the hill. They're planning something terrible. Something that will affect the entire region."
+
+She presses a silver amulet into your hand. "Take this. It will protect you from their sight. But beware—their leader can see through lies."
+
+Before you can respond, she melts into the crowd and disappears.
+
+What do you do?`;
+  }
+  
+  if (lastMessage.includes('fight') || lastMessage.includes('attack')) {
+    return `You ready your weapon as the creature lunges! Roll initiative!
+
+**Combat Begins!**
+
+The goblin snarls, drawing a rusted blade. It's smaller than you but moves with desperate speed. Behind it, you hear more footsteps—reinforcements coming.
+
+**Enemy:** Goblin Scout (HP: 7, AC: 15)
+**Status:** The goblin looks nervous but determined.
+
+The goblin charges at you with a wild screech!
+
+What do you do? (Attack, cast a spell, try to reason with it, or flee?)`;
+  }
+  
+  if (lastMessage.includes('search') || lastMessage.includes('look')) {
+    return `You carefully examine your surroundings. The room is dust-covered but shows signs of recent activity—footprints in the dirt, a burned-down candle still warm to the touch.
+
+**You find:**
+• A leather satchel containing 12 silver pieces and a mysterious key
+• A crumpled note: "Meet at the old oak when the moon is high. The artifact is nearly ours."
+• Tracks leading toward the back door, heading east
+
+As you search, you hear a distant howl—wolf, or something worse?
+
+What do you do?`;
+  }
+  
+  // Default response
+  return `The world responds to your actions. The path ahead is unclear, but fortune favors the bold.
+
+Around you, the adventure continues to unfold. Every choice shapes your destiny.
+
+What do you do?`;
 }
 
 // Create new campaign

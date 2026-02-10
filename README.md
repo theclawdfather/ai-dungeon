@@ -14,21 +14,37 @@ An AI-powered D&D dungeon master that runs campaigns, generates quests, and resp
 
 ## Quick Start
 
-### 1. Get an OpenAI API Key
+### Option 1: Demo Mode (FREE - No API Key Needed!)
 
-Go to [platform.openai.com](https://platform.openai.com) and create an API key.
-
-### 2. Install & Run
+Just use mock mode for pre-written adventures:
 
 ```bash
-# Install dependencies
 npm install
+echo "AI_PROVIDER=mock" > .env
+npm start
+```
 
-# Setup environment
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+### Option 2: Groq AI (FREE Tier)
 
-# Start the server
+1. Get free API key at [console.groq.com](https://console.groq.com) (no credit card!)
+2. Run:
+
+```bash
+npm install
+echo "AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_key" > .env
+npm start
+```
+
+### Option 3: OpenAI (Requires Payment)
+
+1. Get API key at [platform.openai.com](https://platform.openai.com)
+2. Run:
+
+```bash
+npm install
+echo "AI_PROVIDER=openai
+OPENAI_API_KEY=your_key" > .env
 npm start
 ```
 
