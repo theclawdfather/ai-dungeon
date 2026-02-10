@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // AI Provider setup
-const AI_PROVIDER = process.env.AI_PROVIDER || 'mock'; // 'openai', 'groq', or 'mock'
+const AI_PROVIDER = process.env.AI_PROVIDER || 'mock'; // 'openai', 'groq', 'kimi', or 'mock'
 
 let openai = null;
 if (AI_PROVIDER === 'openai' && process.env.OPENAI_API_KEY) {
@@ -20,6 +20,12 @@ if (AI_PROVIDER === 'openai' && process.env.OPENAI_API_KEY) {
   openai = new OpenAI({ 
     apiKey: process.env.GROQ_API_KEY,
     baseURL: 'https://api.groq.com/openai/v1'
+  });
+} else if (AI_PROVIDER === 'kimi' && process.env.KIMI_API_KEY) {
+  const OpenAI = require('openai');
+  openai = new OpenAI({ 
+    apiKey: process.env.KIMI_API_KEY,
+    baseURL: 'https://api.moonshot.cn/v1'
   });
 }
 
@@ -62,8 +68,15 @@ Keep responses engaging and move the story forward.`;
     return generateMockResponse(messages, campaignContext);
   }
 
-  // Groq uses different model names
-  const model = AI_PROVIDER === 'groq' ? 'llama3-8b-8192' : 'gpt-4o-mini';
+  // Groq and Kimi use different model names
+  let model;
+  if (AI_PROVIDER === 'groq') {
+    model = 'llama3-8b-8192';
+  } else if (AI_PROVIDER === 'kimi') {
+    model = 'moonshot-v1-8k'; // or moonshot-v1-32k, moonshot-v1-128k
+  } else {
+    model = 'gpt-4o-mini';
+  }
 
   const response = await openai.chat.completions.create({
     model: model,

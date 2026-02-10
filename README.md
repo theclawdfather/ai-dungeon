@@ -36,7 +36,16 @@ GROQ_API_KEY=your_groq_key" > .env
 npm start
 ```
 
-### Option 3: OpenAI (Requires Payment)
+### Option 3: Kimi/Moonshot (If you have an API key)
+
+```bash
+npm install
+echo "AI_PROVIDER=kimi
+KIMI_API_KEY=your_kimi_key" > .env
+npm start
+```
+
+### Option 4: OpenAI (Requires Payment)
 
 1. Get API key at [platform.openai.com](https://platform.openai.com)
 2. Run:
