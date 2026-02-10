@@ -94,7 +94,8 @@ Keep responses engaging and move the story forward.`;
 // Mock responses for demo mode (no API needed)
 function generateMockResponse(messages, context) {
   const playerMessages = messages.filter(m => m.role === 'user');
-  const lastMessage = playerMessages[playerMessages.length - 1]?.content.toLowerCase() || '';
+  const lastMessageRaw = playerMessages[playerMessages.length - 1]?.content || '';
+  const lastMessage = lastMessageRaw.toLowerCase();
   
   // Extract character info from context
   const charMatch = context.match(/Character: (.+?), a level 1 (.+?) (.+?)\./);
@@ -113,59 +114,195 @@ In the shadows near the door, a hooded figure watches you intently, their face h
 What do you do?`;
   }
   
-  // Generic responses based on keywords
-  if (lastMessage.includes('tavern') || lastMessage.includes('bar')) {
-    return `The tavern buzzes with low conversation. You approach the bar and catch snippets of gossip—something about missing livestock, strange lights in the forest, and a merchant offering suspiciously good prices for "rare antiquities."
+  // More dynamic responses based on user input
+  const action = lastMessageRaw.toLowerCase();
+  
+  // Check for specific actions and respond accordingly
+  if (action.includes('drink') || action.includes('ale') || action.includes('beer') || action.includes('wine')) {
+    return `You raise the mug and take a long drink. The ale is surprisingly good—dark, rich, with hints of honey and something you can't quite place.
 
-The bartender leans in close. "You look like you can handle yourself. If you're looking for work, old Thomas hasn't returned from the mill since yesterday. His daughter's offering her grandmother's ring as reward."
+"Good stuff, right?" the bartender grins. "Brewed it myself. Secret family recipe." He leans closer, lowering his voice. "Speaking of secrets... you didn't hear this from me, but there's been talk of strange symbols appearing on doors around town. People are scared."
 
-A scuffle breaks out near the dice table as someone accuses another of cheating.
+A nearby patron glances nervously in your direction, then quickly looks away.
 
 What do you do?`;
   }
   
-  if (lastMessage.includes('talk') || lastMessage.includes('speak')) {
-    return `You approach the figure. They startle briefly, then relax when they see you mean no harm. Pushing back their hood reveals an elven woman with haunted eyes.
+  if (action.includes('well') || action.includes('investigate')) {
+    return `You make your way to the old well at the edge of town. The sun is setting, casting long shadows across the deserted square. The well hasn't been used in years—the wood is rotted, the rope frayed.
 
-"You're the adventurer everyone's talking about," she whispers urgently. "Listen carefully—I don't have much time. The cult of the Dark Star meets tonight at the abandoned chapel on the hill. They're planning something terrible. Something that will affect the entire region."
+As you approach, you notice scratch marks on the stone rim. Deep gouges, like something with claws was trying to climb out. The air smells of sulfur and decay.
 
-She presses a silver amulet into your hand. "Take this. It will protect you from their sight. But beware—their leader can see through lies."
+From below, you hear a faint scraping sound. Something is down there.
 
-Before you can respond, she melts into the crowd and disappears.
+What do you do? (Climb down, throw something in, listen more carefully, or return to town?)`;
+  }
+  
+  if (action.includes('leave') || action.includes('exit') || action.includes('go')) {
+    return `You step out into the cool night air. The streets are quieter now, most villagers having retreated to their homes. Torchlight flickers in windows, and somewhere a dog barks at unseen shadows.
+
+As you walk, you notice posters on the notice board:
+
+• "REWARD: Missing dog, answers to 'Biscuit'"
+• "HELP WANTED: Rat problem in the cellar"
+• "WARNING: Curfew in effect after dark"
+
+A town guard eyes you suspiciously from across the street, hand resting on his sword hilt.
 
 What do you do?`;
   }
   
-  if (lastMessage.includes('fight') || lastMessage.includes('attack')) {
-    return `You ready your weapon as the creature lunges! Roll initiative!
+  if (action.includes('sleep') || action.includes('rest') || action.includes('inn') || action.includes('room')) {
+    return `You secure a room for the night—5 silver pieces for a small chamber above the tavern. The bed is lumpy, the blanket thin, but it's better than sleeping in the wild.
+
+In the middle of the night, you're awakened by a scream. High-pitched, terrified, cutting through the silence. It came from somewhere outside.
+
+You leap to your feet, heart pounding. Through the window, you see torchlight dancing in the streets below.
+
+What do you do? (Investigate, barricade the door, or hide?)`;
+  }
+  
+  if (action.includes('question') || action.includes('ask') || action.includes('interrogate')) {
+    return `"What do you know about these disappearances?" you ask pointedly.
+
+The bartender glances around nervously before answering. "Three people this week. All taken at night. No signs of forced entry, no struggle. Just... gone." He wipes the counter absently. "The mayor thinks it's bandits, but I know bandits. Bandits leave messes. This is something else."
+
+He pulls a folded piece of parchment from his apron. "Found this near the mill. Don't know what it means, but it gives me chills."
+
+The parchment shows a crude drawing of an eye surrounded by strange runes.
+
+What do you do?`;
+  }
+  
+  if (action.includes('steal') || action.includes('pickpocket') || action.includes('sneak')) {
+    return `You attempt to move unseen through the crowd. Your fingers brush against a merchant's coin purse—heavy with gold.
+
+**Roll for Sleight of Hand!**
+
+The merchant turns suddenly, eyes narrowing. "Hey! What do you think you're doing?" His hand goes to his belt where a club hangs. Two nearby guards look in your direction.
+
+This could get ugly fast.
+
+What do you do? (Talk your way out, run, fight, or surrender?)`;
+  }
+  
+  if (action.includes('magic') || action.includes('spell') || action.includes('cast')) {
+    return `You weave the arcane gestures and speak the words of power. Energy crackles at your fingertips as the spell takes form.
+
+The room falls silent. Patrons stare in awe and fear. Magic is rare in these parts, and those who wield it command respect... or suspicion.
+
+The bartender bows his head slightly. "A wizard walks among us." He pushes another drink toward you, this one on the house. "Perhaps you are the one the prophecies spoke of."
+
+A hooded figure in the corner stands abruptly and hurries toward the door, glancing back at you with obvious fear.
+
+What do you do?`;
+  }
+  
+  // Generic contextual response that references what they actually said
+  if (action.includes('tavern') || action.includes('bar')) {
+    return `You make your way to the bar. The bartender—a grizzled dwarf with a magnificent beard—gives you a nod. "What'll it be, ${charClass.toLowerCase()}?"
+
+The tavern buzzes with conversation. You overhear snippets:
+- "...saw lights in the old crypt again..."
+- "...my cousin swears he saw a dragon..."
+- "...the mayor's hiding something..."
+
+A scuffle breaks out near the dice table. Someone's cheating, or someone's accused of it.
+
+What do you do?`;
+  }
+  
+  if (action.includes('talk') || action.includes('speak') || action.includes('approach')) {
+    return `You approach the mysterious figure. They tense as you near, hand moving to their weapon.
+
+"I mean no harm," you say, raising your hands slightly.
+
+The figure studies you for a long moment, then relaxes—a fraction. "You're the newcomer. The one asking questions." A woman's voice, rough from disuse. "Be careful what questions you ask in this town. Some answers are dangerous."
+
+She slides a folded note across the table. "If you're serious about helping, be at the old windmill at midnight. Come alone."
+
+Before you can respond, she stands and disappears into the crowd.
+
+What do you do?`;
+  }
+  
+  if (action.includes('fight') || action.includes('attack') || action.includes('hit') || action.includes('punch')) {
+    return `Violence erupts! You lash out with practiced precision.
 
 **Combat Begins!**
 
-The goblin snarls, drawing a rusted blade. It's smaller than you but moves with desperate speed. Behind it, you hear more footsteps—reinforcements coming.
+Your strike connects with a satisfying crunch. The target staggers back, eyes wide with surprise and pain. Around you, the tavern erupts into chaos—patrons screaming, chairs overturning, drinks spilling.
 
-**Enemy:** Goblin Scout (HP: 7, AC: 15)
-**Status:** The goblin looks nervous but determined.
+The town guard bursts through the door, weapons drawn. "HOLD!"
 
-The goblin charges at you with a wild screech!
+You have seconds before they reach you.
 
-What do you do? (Attack, cast a spell, try to reason with it, or flee?)`;
+What do you do? (Surrender, flee, or stand your ground?)`;
   }
   
-  if (lastMessage.includes('search') || lastMessage.includes('look')) {
-    return `You carefully examine your surroundings. The room is dust-covered but shows signs of recent activity—footprints in the dirt, a burned-down candle still warm to the touch.
+  if (action.includes('search') || action.includes('look') || action.includes('examine') || action.includes('inspect')) {
+    return `You carefully examine your surroundings. Details emerge from the shadows:
 
-**You find:**
-• A leather satchel containing 12 silver pieces and a mysterious key
-• A crumpled note: "Meet at the old oak when the moon is high. The artifact is nearly ours."
-• Tracks leading toward the back door, heading east
+• Scratches on the floorboards—recent, deep
+• A half-burned letter in the fireplace, still legible: "...the ritual must be completed by the blood moon..."
+• A hidden compartment under the loose floorboard containing a silver dagger engraved with strange runes
+• Fresh muddy boot prints leading toward the back door
 
-As you search, you hear a distant howl—wolf, or something worse?
+Someone was here recently, and they were in a hurry.
 
 What do you do?`;
   }
   
-  // Default response
-  return `The world responds to your actions. The path ahead is unclear, but fortune favors the bold.
+  if (action.includes('run') || action.includes('flee') || action.includes('escape')) {
+    return `You turn and run, boots pounding against cobblestones. Behind you, shouts and the sounds of pursuit.
+
+You duck through narrow alleys, leaping over barrels and dodging laundry lines. The town is a maze, but adrenaline sharpens your senses.
+
+You burst through a doorway into—an empty warehouse. Dust motes dance in shafts of moonlight. You're alone. For now.
+
+Through a cracked window, you see torchlight bobbing in the streets. They're still searching.
+
+What do you do? (Hide, keep running, or prepare an ambush?)`;
+  }
+  
+  if (action.includes('help') || action.includes('save') || action.includes('rescue')) {
+    return `Your heart swells with righteous determination. These people need help, and you're the one to give it.
+
+An old woman approaches, tears streaming down her face. "Please, ${charClass.toLowerCase()}, you have to help me! My granddaughter was taken last night. She's only eight years old. The guards won't listen—they say she's just another runaway. But I know better. I saw the shadows that took her."
+
+She grips your arm with surprising strength. "I'll give you everything I have. Just bring her back."
+
+What do you do?`;
+  }
+  
+  // Truly generic response that still acknowledges their action
+  const genericResponses = [
+    `"${lastMessageRaw}," you declare. The world seems to pause, considering your words.
+
+The tavern falls quiet. All eyes turn to you. Somewhere, a glass drops and shatters.
+
+Then, slowly, conversation resumes—but now they're watching. Waiting to see what you'll do next.
+
+What do you do?`,
+
+    `You ${lastMessageRaw.includes(' ') ? lastMessageRaw.split(' ')[0] : lastMessageRaw} with determination. The path ahead is uncertain, but ${charName} did not become a ${charClass} by playing it safe.
+
+A cool breeze drifts through the open door, carrying the scent of rain and distant pine. Adventure calls.
+
+What do you do?`,
+
+    `Your action—"${lastMessageRaw}"—echoes in the silence. For a moment, nothing happens. Then:
+
+The floorboards creak. A door slams somewhere upstairs. The candle on your table flickers and dies, plunging you into shadow.
+
+When your eyes adjust, you notice something you hadn't before: a symbol carved into the table, glowing faintly with inner light.
+
+What do you do?`
+  ];
+  
+  // Pick response based on message count to add variety
+  return genericResponses[playerMessages.length % genericResponses.length];
+}
 
 Around you, the adventure continues to unfold. Every choice shapes your destiny.
 
